@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperar Contraseña</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    width: 350px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #00e6f6 0%, #a259ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+  }
+  h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+  }
+  .form-group { margin-bottom: 15px; text-align: left; }
+  label { display: block; margin-bottom: 6px; font-size: 0.9rem; }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    background: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    outline: none;
+    transition: border 0.3s;
+  }
+  input:focus { border-color: #888; }
+  .error { color: #ff5c5c; font-size: 0.8rem; margin-top: 4px; }
+  .info { background: #2a2a2a; padding: 8px; border-radius: 6px; color: #9ad67f; font-size: 0.85rem; margin-bottom: 10px; }
+  button {
+    width: 100%;
+    background: #333;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+  }
+  button:hover:enabled { background: #444; transform: translateY(-2px); }
+  button:disabled { background: #2a2a2a; cursor: not-allowed; }
+  .hidden { display: none; }
+  .strength { height: 5px; border-radius: 3px; margin-top: 5px; background: #333; }
+  .strength-bar { height: 5px; border-radius: 3px; background: #4caf50; width: 0%; transition: width 0.3s; }
+  footer { margin-top: 25px; font-size: 0.8rem; color: #666; text-align: center; }
+
+  /* modal de contraseña actualizada*/
+  #modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  #modal.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #modalContent {
+    background: #1e1e1e;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+  #modalContent p {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #9ad67f;
+  }
+  #modalContent button {
+    width: auto;
+    padding: 8px 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>TRIMLY</h1>
+  <h2>Recuperar Contraseña</h2>
+
+  <div id="info" class="info hidden"></div>
+
+  <!-- Pantalla 1: Email -->
+  <form id="formEmail">
+    <div class="form-group">
+      <label for="email">Correo electrónico</label>
+      <input type="text" id="email" placeholder="ej:usuario@gmail.com">
+      <div id="emailError" class="error"></div>
+    </div>
+    <button type="submit" disabled>Enviar código</button>
+    <button type="button" id="volverInicial">Volver</button>
+  </form>
+
+  <!-- Pantalla 2: Código -->
+  <form id="formCodigo" class="hidden">
+    <div class="form-group">
+      <label for="codigo">Código de seguridad</label>
+      <input type="text" id="codigo" maxlength="6" placeholder="ej:123456">
+      <div id="codigoError" class="error"></div>
+    </div>
+    <button type="submit" disabled>Verificar código</button>
+    <button type="button" id="volverEmail">Volver</button>
+  </form>
+
+  <!-- Pantalla 3: Nueva contraseña -->
+  <form id="formContrasena" class="hidden">
+    <div class="form-group">
+      <label for="password">Nueva contraseña</label>
+      <input type="password" id="password" placeholder="Mínimo 8 caracteres">
+      <div id="passwordError" class="error"></div>
+      <div class="strength"><div id="strengthBar" class="strength-bar"></div></div>
+    </div>
+    <div class="form-group">
+      <label for="confirmar">Confirmar contraseña</label>
+      <input type="password" id="confirmar" placeholder="Repite la contraseña">
+      <div id="confirmError" class="error"></div>
+    </div>
+    <button type="submit" disabled>Actualizar contraseña</button>
+    <button type="button" id="volverCodigo">Volver</button>
+  </form>
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div id="modalContent">
+    <p id="modalMessage">Mensaje</p>
+    <button id="closeModal">Aceptar</button>
+  </div>
+</div>
+
+<footer>© 2025 TRIMLY - Todos los derechos reservados</footer>
+
+<script>
+const HARDCODED_EMAIL = "usuario01@gmail.com";
+const HARDCODED_CODE = "345678";
+
+const formEmail = document.getElementById('formEmail');
+const formCodigo = document.getElementById('formCodigo');
+const formContrasena = document.getElementById('formContrasena');
+const info = document.getElementById('info');
+
+const modal = document.getElementById('modal');
+const modalMessage = document.getElementById('modalMessage');
+const closeModal = document.getElementById('closeModal');
+
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('input', () => {
+    const form = input.closest('form');
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = !input.value.trim();
+  });
+});
+
+
+formEmail.addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const emailError = document.getElementById('emailError');
+  emailError.textContent = '';
+  info.classList.add('hidden');
+
+  if (!email) { emailError.textContent = 'El email es obligatorio'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailError.textContent = 'Formato de email inválido'; return; }
+  if (email !== HARDCODED_EMAIL) { emailError.textContent = 'No existe una cuenta con ese email'; return; }
+
+  info.textContent = `Se envió un código a ${email} (codigo:${HARDCODED_CODE})`;
+  info.classList.remove('hidden');
+  formEmail.classList.add('hidden');
+  formCodigo.classList.remove('hidden');
+});
+
+formCodigo.addEventListener('submit', e => {
+  e.preventDefault();
+  const codigo = document.getElementById('codigo').value.trim();
+  const codigoError = document.getElementById('codigoError');
+  codigoError.textContent = '';
+  info.classList.add('hidden');
+
+  if (!codigo) { codigoError.textContent = 'El código es obligatorio'; return; }
+  if (!/^[0-9]{6}$/.test(codigo)) { codigoError.textContent = 'Debe tener 6 dígitos'; return; }
+  if (codigo !== HARDCODED_CODE) { codigoError.textContent = 'Código incorrecto'; return; }
+
+  info.textContent = 'Código verificado. Puede crear una nueva contraseña';
+  info.classList.remove('hidden');
+  formCodigo.classList.add('hidden');
+  formContrasena.classList.remove('hidden');
+});
+
+formContrasena.addEventListener('submit', e => {
+  e.preventDefault();
+  const password = document.getElementById('password').value;
+  const confirmar = document.getElementById('confirmar').value;
+  const passwordError = document.getElementById('passwordError');
+  const confirmError = document.getElementById('confirmError');
+  passwordError.textContent = '';
+  confirmError.textContent = '';
+  info.classList.add('hidden');
+
+  if (!password) { passwordError.textContent = 'La contraseña es obligatoria'; return; }
+  if (password.length < 8) { passwordError.textContent = 'Debe tener al menos 8 caracteres'; return; }
+  if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || (!/[0-9]/.test(password) && !/[\W_]/.test(password))) {
+    passwordError.textContent = 'Debe incluir mayúsculas, minúsculas y un número o símbolo'; return;
+  }
+  if (password !== confirmar) { confirmError.textContent = 'Las contraseñas no coinciden'; return; }
+
+  modalMessage.textContent = 'Contraseña actualizada correctamente';
+  modal.classList.add('show');
+});
+
+closeModal.addEventListener('click', () => {
+  modal.classList.remove('show');
+  formContrasena.classList.add('hidden');
+  formEmail.classList.remove('hidden');
+  formEmail.reset();
+  formCodigo.reset();
+  formContrasena.reset();
+});
+
+document.getElementById('volverInicial').addEventListener('click', () => {
+  formEmail.reset();
+  formCodigo.reset();
+  formContrasena.reset();
+  info.classList.add('hidden');
+});
+document.getElementById('volverEmail').addEventListener('click', () => {
+  formCodigo.classList.add('hidden');
+  formEmail.classList.remove('hidden');
+});
+document.getElementById('volverCodigo').addEventListener('click', () => {
+  formContrasena.classList.add('hidden');
+  formCodigo.classList.remove('hidden');
+});
+
+document.getElementById('password').addEventListener('input', e => {
+  const val = e.target.value;
+  const bar = document.getElementById('strengthBar');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val) || /[\W_]/.test(val)) score++;
+  bar.style.width = (score * 33) + '%';
+});
+</script>
+</body>
+</html>
