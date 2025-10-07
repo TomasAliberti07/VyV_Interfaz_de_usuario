@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Pedido - Ejercicio 3</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Confirmación de Pedido</h1>
+            <p class="subtitle">Ejercicio 3: La Regla de Negocio y el Botón Gris</p>
+        </header>
+
+        <div class="content">
+            <!-- Breadcrumb de Selección de Producto -->
+            <section class="section">
+                <h2>Selecciona un Producto</h2>
+                <p class="instruction">Navega por categorías para seleccionar un producto</p>
+                
+                <!-- Breadcrumb -->
+                <div class="breadcrumb" id="breadcrumb">
+                    <span class="breadcrumb-item active">Inicio</span>
+                </div>
+
+                <!-- Área de Navegación -->
+                <div class="navigation-area" id="navigationArea">
+                    <!-- Aquí se cargarán dinámicamente las categorías/subcategorías/productos -->
+                </div>
+
+                <!-- Producto Seleccionado -->
+                <div class="selected-product" id="selectedProduct" style="display: none;">
+                    <div class="badge success">Producto seleccionado</div>
+                    <p class="product-name" id="productName"></p>
+                    <button class="btn-change" id="btnChangeProduct">Cambiar producto</button>
+                </div>
+            </section>
+
+            <!-- Sección de Dirección -->
+            <section class="section">
+                <h2>Dirección de Envío</h2>
+                <p class="instruction">Selecciona una dirección de envío</p>
+                
+                <div class="addresses">
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="casa" class="address-radio">
+                        <div class="address-content">
+                            <h3>Casa</h3>
+                            <p>Av. Principal 123, Ciudad</p>
+                        </div>
+                    </label>
+
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="oficina" class="address-radio">
+                        <div class="address-content">
+                            <h3>Oficina</h3>
+                            <p>Calle Comercial 456, Centro</p>
+                        </div>
+                    </label>
+
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="otro" class="address-radio">
+                        <div class="address-content">
+                            <h3>Otra Dirección</h3>
+                            <p>Apartado Postal 789</p>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Estado de Validación -->
+            <section class="validation-status">
+                <div class="status-item" id="status-producto">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Producto no seleccionado</span>
+                </div>
+                <div class="status-item" id="status-direccion">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Dirección no seleccionada</span>
+                </div>
+            </section>
+
+            <!-- Botón de Confirmación -->
+            <div class="button-container">
+                <button id="btnConfirmar" class="btn-confirmar" disabled>
+                    Confirmar Pedido
+                </button>
+                <p class="helper-text" id="helperText">
+                    Completa ambos requisitos para habilitar el botón
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Regla de Negocio:</strong> El usuario no puede confirmar el pedido hasta que haya seleccionado al menos un producto y una dirección de envío.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
