@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Oculto - Campo de Fecha</title>
+    <link rel="stylesheet" href="ejercicio1_styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 id="mainTitle">Registro de Usuario</h1>
+            <p class="subtitle">Trabajo Práctico Integrador - EC VyV con UI</p>
+            
+            <div class="demo-section" id="demoSection">
+                <h2 id="demoTitle">🐛 Error Oculto del Campo de Fecha</h2>
+                <p class="description" id="demoDescription">
+                    Este formulario valida el formato DD/MM/AAAA pero <strong>NO valida que el mes sea ≤ 12</strong>
+                </p>
+            </div>
+
+            <form class="form" id="userForm">
+                <div class="form-group">
+                    <label for="name">Nombre completo</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Fecha de nacimiento (DD/MM/AAAA)</label>
+                    <input type="text" id="birthdate" name="birthdate" placeholder="15/03/1995" required>
+                    <div class="help-text">Formato requerido: DD/MM/AAAA</div>
+                    <div class="validation-message" id="validationMessage"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">Registrar Usuario</button>
+            </form>
+
+            <div class="test-cases">
+                <h3>🧪 Casos de Prueba</h3>
+                <div class="test-grid">
+                    <div class="test-case valid">
+                        <strong>✅ Válido:</strong> 15/03/1995
+                    </div>
+                    <div class="test-case valid">
+                        <strong>✅ Válido:</strong> 01/12/2000
+                    </div>
+                    <div class="test-case error">
+                        <strong>❌ Error Oculto:</strong> 15/13/1995
+                    </div>
+                    <div class="test-case error">
+                        <strong>❌ Error Oculto:</strong> 01/99/2000
+                    </div>
+                </div>
+                <p class="error-explanation">
+                    <strong>¡Problema!</strong> El sistema acepta meses como 13, 99, etc. porque solo valida el formato DD/MM/AAAA pero no el rango del mes (1-12).
+                </p>
+            </div>
+
+            <div class="success-message" id="successMessage" style="display: none;">
+                <div class="success-content">
+                    <span class="success-icon">🎉</span>
+                    <div id="registeredData"></div>
+                </div>
+            </div>
+            
+            <div class="final-success-banner" id="finalSuccessBanner" style="display: none;">
+                <div class="banner-content">
+                    <span class="banner-icon">🎉</span>
+                    <div>
+                        <strong>¡Usuario registrado!</strong>
+                        <p id="finalRegisteredData"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('userForm');
+        const birthdateInput = document.getElementById('birthdate');
+        const validationMessage = document.getElementById('validationMessage');
+        const successMessage = document.getElementById('successMessage');
+        const registeredData = document.getElementById('registeredData');
+
+        // Función de validación con el error oculto
+        function validateDate(dateString) {
+            // Solo valida el formato DD/MM/AAAA, NO valida que el mes sea <= 12
+            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+            return regex.test(dateString);
+        }
+
+        function updatePageContent(isValidMonth) {
+            const mainTitle = document.getElementById('mainTitle');
+            const demoTitle = document.getElementById('demoTitle');
+            const demoDescription = document.getElementById('demoDescription');
+            const demoSection = document.getElementById('demoSection');
+            
+            if (isValidMonth) {
+                // Caso válido - Primera imagen
+                mainTitle.innerHTML = 'Registro de Usuario - <span style="color: #8b47ee;">Caso Válido</span>';
+                demoTitle.innerHTML = '✅ Campo con Fecha Válida';
+                demoDescription.innerHTML = 'Fecha con mes válido (≤ 12) - El sistema la acepta correctamente';
+                demoSection.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1))';
+                demoSection.style.borderColor = 'rgb(34, 197, 94)';
+            } else {
+                // Caso error - Segunda imagen
+                mainTitle.innerHTML = 'Registro de Usuario - <span style="color: #8b47ee;">Error Oculto</span>';
+                demoTitle.innerHTML = '🐛 Error Oculto del Campo de Fecha';
+                demoDescription.innerHTML = 'Este formulario valida el formato DD/MM/AAAA pero <strong>NO valida que el mes sea ≤ 12</strong>';
+                demoSection.style.background = 'linear-gradient(135deg, rgba(139, 71, 238, 0.2), rgba(139, 71, 238, 0.1))';
+                demoSection.style.borderColor = '#8b47ee';
+            }
+        }
+
+        birthdateInput.addEventListener('input', function() {
+            const value = this.value;
+            validationMessage.textContent = '';
+            validationMessage.className = 'validation-message';
+            
+            if (value && !validateDate(value)) {
+                validationMessage.textContent = 'Formato inválido. Use DD/MM/AAAA';
+                validationMessage.classList.add('error');
+                updatePageContent(false);
+            } else if (value && validateDate(value)) {
+                // Aquí está el error: acepta cualquier mes sin validar el rango
+                const parts = value.split('/');
+                const month = parseInt(parts[1]);
+                
+                if (month > 12) {
+                    validationMessage.textContent = '⚠️ Formato válido (pero mes > 12 no detectado)';
+                    validationMessage.classList.add('warning');
+                    updatePageContent(false);
+                    
+                    // Cambiar color del input para mostrar el error oculto
+                    this.style.borderColor = '#eab308';
+                    this.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.2)';
+                } else {
+                    validationMessage.textContent = '✅ Formato válido - Fecha correcta';
+                    validationMessage.classList.add('success');
+                    updatePageContent(true);
+                    
+                    // Resetear estilo del input
+                    this.style.borderColor = '#00e6e6';
+                    this.style.boxShadow = '0 0 0 3px rgba(0, 230, 230, 0.2)';
+                }
+            } else {
+                updatePageContent(false);
+                // Resetear estilo del input
+                this.style.borderColor = '#404040';
+                this.style.boxShadow = 'none';
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const birthdate = birthdateInput.value;
+            
+            if (!validateDate(birthdate)) {
+                validationMessage.textContent = 'Por favor, ingrese una fecha válida';
+                validationMessage.className = 'validation-message error';
+                return;
+            }
+            
+            // Determinar si es una fecha con mes inválido
+            const parts = birthdate.split('/');
+            const month = parseInt(parts[1]);
+            const isInvalidMonth = month > 12;
+            
+            // Mostrar mensaje temporal
+            if (isInvalidMonth) {
+                registeredData.innerHTML = `<strong>🎉 ¡Usuario registrado!</strong><br>Nombre: ${name} | Fecha: ${birthdate} (¡Fecha inválida aceptada!)`;
+            } else {
+                registeredData.innerHTML = `<strong>🎉 ¡Usuario registrado!</strong><br>Nombre: ${name} | Fecha: ${birthdate}`;
+            }
+            
+            successMessage.style.display = 'block';
+            
+            // Después de 2 segundos, mostrar el banner final
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                
+                const finalBanner = document.getElementById('finalSuccessBanner');
+                const finalData = document.getElementById('finalRegisteredData');
+                
+                if (isInvalidMonth) {
+                    finalData.innerHTML = `Nombre: ${name} | Fecha: ${birthdate} (¡Fecha inválida aceptada!)`;
+                } else {
+                    finalData.innerHTML = `Nombre: ${name} | Fecha: ${birthdate}`;
+                }
+                
+                finalBanner.style.display = 'block';
+                
+                // Ocultar todo después de otros 5 segundos
+                setTimeout(() => {
+                    finalBanner.style.display = 'none';
+                    form.reset();
+                    validationMessage.textContent = '';
+                    validationMessage.className = 'validation-message';
+                    updatePageContent(false);
+                    birthdateInput.style.borderColor = '#404040';
+                    birthdateInput.style.boxShadow = 'none';
+                }, 5000);
+            }, 2000);
+        });
+
+        // Agregar eventos a los casos de prueba para prueba rápida
+        document.querySelectorAll('.test-case').forEach(testCase => {
+            testCase.addEventListener('click', function() {
+                const text = this.textContent;
+                const dateMatch = text.match(/\d{2}\/\d{2}\/\d{4}/);
+                if (dateMatch) {
+                    birthdateInput.value = dateMatch[0];
+                    birthdateInput.dispatchEvent(new Event('input'));
+                    
+                    // También llenar el nombre según el caso
+                    const nameInput = document.getElementById('name');
+                    if (text.includes('Error Oculto')) {
+                        nameInput.value = 'María García';
+                    } else {
+                        nameInput.value = 'Juan Pérez';
+                    }
+                }
+            });
+        });
+
+        // Función para demostrar casos específicos
+        function showValidCase() {
+            document.getElementById('name').value = 'Juan Pérez';
+            birthdateInput.value = '15/03/1995';
+            birthdateInput.dispatchEvent(new Event('input'));
+        }
+
+        function showErrorCase() {
+            document.getElementById('name').value = 'María García';
+            birthdateInput.value = '15/13/1995';
+            birthdateInput.dispatchEvent(new Event('input'));
+        }
+
+        // Inicializar con caso de error para mostrar el problema
+        setTimeout(() => {
+            showErrorCase();
+        }, 500);
+    </script>
+</body>
+</html>
