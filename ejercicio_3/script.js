@@ -1,36 +1,203 @@
+// Estructura de datos para categorías, subcategorías y productos
+const productData = {
+    categorias: [
+        {
+            id: 'electronica',
+            nombre: 'Electrónica',
+            subcategorias: [
+                {
+                    id: 'computadoras',
+                    nombre: 'Computadoras',
+                    productos: [
+                        { id: 'laptop-hp', nombre: 'Laptop HP Pavilion', precio: '$899.99' },
+                        { id: 'laptop-dell', nombre: 'Laptop Dell Inspiron', precio: '$1099.99' },
+                        { id: 'laptop-lenovo', nombre: 'Laptop Lenovo ThinkPad', precio: '$1299.99' }
+                    ]
+                },
+                {
+                    id: 'accesorios',
+                    nombre: 'Accesorios',
+                    productos: [
+                        { id: 'mouse-logitech', nombre: 'Mouse Logitech MX Master', precio: '$89.99' },
+                        { id: 'teclado-mecanico', nombre: 'Teclado Mecánico RGB', precio: '$129.99' },
+                        { id: 'webcam-hd', nombre: 'Webcam HD 1080p', precio: '$69.99' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'hogar',
+            nombre: 'Hogar',
+            subcategorias: [
+                {
+                    id: 'cocina',
+                    nombre: 'Cocina',
+                    productos: [
+                        { id: 'licuadora', nombre: 'Licuadora Oster', precio: '$79.99' },
+                        { id: 'cafetera', nombre: 'Cafetera Espresso', precio: '$199.99' },
+                        { id: 'microondas', nombre: 'Microondas Samsung', precio: '$149.99' }
+                    ]
+                },
+                {
+                    id: 'decoracion',
+                    nombre: 'Decoración',
+                    productos: [
+                        { id: 'lampara-mesa', nombre: 'Lámpara de Mesa LED', precio: '$39.99' },
+                        { id: 'espejo-pared', nombre: 'Espejo de Pared Grande', precio: '$89.99' },
+                        { id: 'cuadro-abstracto', nombre: 'Cuadro Abstracto', precio: '$59.99' }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
 // Elementos del DOM
-const productCheckboxes = document.querySelectorAll('.product-checkbox');
+const breadcrumb = document.getElementById('breadcrumb');
+const navigationArea = document.getElementById('navigationArea');
+const selectedProductDiv = document.getElementById('selectedProduct');
+const productNameElement = document.getElementById('productName');
+const btnChangeProduct = document.getElementById('btnChangeProduct');
 const addressRadios = document.querySelectorAll('.address-radio');
 const btnConfirmar = document.getElementById('btnConfirmar');
 const statusProducto = document.getElementById('status-producto');
 const statusDireccion = document.getElementById('status-direccion');
 const helperText = document.getElementById('helperText');
 
-// Estado de validación
+// Estado de la aplicación
+let currentPath = [];
+let selectedProduct = null;
 let validationState = {
     productoSeleccionado: false,
     direccionSeleccionada: false
 };
 
 /**
- * Valida si al menos un producto está seleccionado
+ * Renderiza el breadcrumb según la ruta actual
  */
-function validarProductos() {
-    const algunProductoSeleccionado = Array.from(productCheckboxes).some(checkbox => checkbox.checked);
-    validationState.productoSeleccionado = algunProductoSeleccionado;
+function renderBreadcrumb() {
+    breadcrumb.innerHTML = '<span class="breadcrumb-item" data-level="0">Inicio</span>';
     
-    // Actualizar UI del estado de producto
-    if (algunProductoSeleccionado) {
-        statusProducto.classList.add('valid');
-        statusProducto.querySelector('.status-icon').textContent = '✅';
-        statusProducto.querySelector('.status-text').textContent = 'Producto seleccionado';
-    } else {
-        statusProducto.classList.remove('valid');
-        statusProducto.querySelector('.status-icon').textContent = '❌';
-        statusProducto.querySelector('.status-text').textContent = 'Producto no seleccionado';
+    currentPath.forEach((item, index) => {
+        const span = document.createElement('span');
+        span.className = 'breadcrumb-item';
+        span.textContent = item.nombre;
+        span.dataset.level = index + 1;
+        breadcrumb.appendChild(span);
+    });
+    
+    // Marcar el último como activo
+    const items = breadcrumb.querySelectorAll('.breadcrumb-item');
+    items[items.length - 1].classList.add('active');
+    
+    // Añadir event listeners para navegación
+    items.forEach((item, index) => {
+        item.addEventListener('click', () => {
+            navigateToLevel(index);
+        });
+    });
+}
+
+/**
+ * Navega a un nivel específico del breadcrumb
+ */
+function navigateToLevel(level) {
+    currentPath = currentPath.slice(0, level);
+    renderNavigation();
+    renderBreadcrumb();
+}
+
+/**
+ * Renderiza el área de navegación según el nivel actual
+ */
+function renderNavigation() {
+    navigationArea.innerHTML = '';
+    
+    if (currentPath.length === 0) {
+        // Mostrar categorías
+        productData.categorias.forEach(categoria => {
+            const card = createNavCard(categoria.nombre, 'Explorar categoría');
+            card.addEventListener('click', () => {
+                currentPath.push({ tipo: 'categoria', nombre: categoria.nombre, data: categoria });
+                renderNavigation();
+                renderBreadcrumb();
+            });
+            navigationArea.appendChild(card);
+        });
+    } else if (currentPath.length === 1) {
+        // Mostrar subcategorías
+        const categoria = currentPath[0].data;
+        categoria.subcategorias.forEach(subcategoria => {
+            const card = createNavCard(subcategoria.nombre, 'Ver productos');
+            card.addEventListener('click', () => {
+                currentPath.push({ tipo: 'subcategoria', nombre: subcategoria.nombre, data: subcategoria });
+                renderNavigation();
+                renderBreadcrumb();
+            });
+            navigationArea.appendChild(card);
+        });
+    } else if (currentPath.length === 2) {
+        // Mostrar productos
+        const subcategoria = currentPath[1].data;
+        subcategoria.productos.forEach(producto => {
+            const card = createNavCard(producto.nombre, producto.precio);
+            card.classList.add('product');
+            card.addEventListener('click', () => {
+                selectProduct(producto);
+            });
+            navigationArea.appendChild(card);
+        });
     }
+}
+
+/**
+ * Crea una card de navegación
+ */
+function createNavCard(title, subtitle) {
+    const card = document.createElement('div');
+    card.className = 'nav-card';
+    card.innerHTML = `
+        <h3>${title}</h3>
+        <p>${subtitle}</p>
+    `;
+    return card;
+}
+
+/**
+ * Selecciona un producto
+ */
+function selectProduct(producto) {
+    selectedProduct = producto;
+    validationState.productoSeleccionado = true;
     
-    actualizarBoton();
+    // Ocultar navegación y mostrar producto seleccionado
+    navigationArea.style.display = 'none';
+    breadcrumb.style.display = 'none';
+    selectedProductDiv.style.display = 'block';
+    
+    productNameElement.textContent = `${producto.nombre} - ${producto.precio}`;
+    
+    actualizarValidacion();
+}
+
+/**
+ * Permite cambiar el producto seleccionado
+ */
+function changeProduct() {
+    selectedProduct = null;
+    validationState.productoSeleccionado = false;
+    
+    // Mostrar navegación y ocultar producto seleccionado
+    navigationArea.style.display = 'grid';
+    breadcrumb.style.display = 'flex';
+    selectedProductDiv.style.display = 'none';
+    
+    // Volver al inicio
+    currentPath = [];
+    renderNavigation();
+    renderBreadcrumb();
+    
+    actualizarValidacion();
 }
 
 /**
@@ -39,99 +206,67 @@ function validarProductos() {
 function validarDireccion() {
     const direccionSeleccionada = Array.from(addressRadios).some(radio => radio.checked);
     validationState.direccionSeleccionada = direccionSeleccionada;
-    
-    // Actualizar UI del estado de dirección
-    if (direccionSeleccionada) {
-        statusDireccion.classList.add('valid');
-        statusDireccion.querySelector('.status-icon').textContent = '✅';
-        statusDireccion.querySelector('.status-text').textContent = 'Dirección seleccionada';
-    } else {
-        statusDireccion.classList.remove('valid');
-        statusDireccion.querySelector('.status-icon').textContent = '❌';
-        statusDireccion.querySelector('.status-text').textContent = 'Dirección no seleccionada';
-    }
-    
-    actualizarBoton();
+    actualizarValidacion();
 }
 
 /**
- * Actualiza el estado del botón basado en las reglas de negocio
- * REGLA: El botón solo se habilita si hay al menos un producto Y una dirección seleccionados
+ * Actualiza el estado visual de validación
  */
-function actualizarBoton() {
+function actualizarValidacion() {
+    // Estado del producto
+    if (validationState.productoSeleccionado) {
+        statusProducto.classList.add('valid');
+        statusProducto.querySelector('.status-text').textContent = 'Producto seleccionado';
+    } else {
+        statusProducto.classList.remove('valid');
+        statusProducto.querySelector('.status-text').textContent = 'Producto no seleccionado';
+    }
+    
+    // Estado de la dirección
+    if (validationState.direccionSeleccionada) {
+        statusDireccion.classList.add('valid');
+        statusDireccion.querySelector('.status-text').textContent = 'Dirección seleccionada';
+    } else {
+        statusDireccion.classList.remove('valid');
+        statusDireccion.querySelector('.status-text').textContent = 'Dirección no seleccionada';
+    }
+    
+    // Estado del botón (REGLA DE NEGOCIO)
     const todasLasValidacionesPasadas = validationState.productoSeleccionado && validationState.direccionSeleccionada;
     
     if (todasLasValidacionesPasadas) {
-        // Habilitar botón
         btnConfirmar.disabled = false;
-        btnConfirmar.querySelector('.btn-icon').textContent = '🔓';
-        btnConfirmar.querySelector('.btn-text').textContent = 'Confirmar Pedido';
         helperText.textContent = '¡Listo! Puedes confirmar tu pedido';
         helperText.classList.add('success');
     } else {
-        // Deshabilitar botón
         btnConfirmar.disabled = true;
-        btnConfirmar.querySelector('.btn-icon').textContent = '🔒';
-        btnConfirmar.querySelector('.btn-text').textContent = 'Confirmar Pedido';
         helperText.textContent = 'Completa ambos requisitos para habilitar el botón';
         helperText.classList.remove('success');
     }
 }
 
 /**
- * Maneja el clic en el botón de confirmar
+ * Confirma el pedido
  */
 function confirmarPedido() {
-    if (!btnConfirmar.disabled) {
-        // Obtener productos seleccionados
-        const productosSeleccionados = Array.from(productCheckboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
+    if (!btnConfirmar.disabled && selectedProduct) {
+        const direccionSeleccionada = Array.from(addressRadios).find(radio => radio.checked);
+        const direccionTexto = direccionSeleccionada.parentElement.querySelector('h3').textContent;
         
-        // Obtener dirección seleccionada
-        const direccionSeleccionada = Array.from(addressRadios)
-            .find(radio => radio.checked)?.value;
-        
-        // Mostrar confirmación
-        const mensaje = `
-🎉 ¡Pedido Confirmado!
-
-📦 Productos: ${productosSeleccionados.join(', ')}
-📍 Dirección: ${direccionSeleccionada}
-
-Gracias por tu compra.
-        `;
-        
-        alert(mensaje);
-        
-        // Opcional: Resetear formulario
-        // resetearFormulario();
+        alert(`✓ Pedido Confirmado\n\nProducto: ${selectedProduct.nombre}\nPrecio: ${selectedProduct.precio}\nDirección: ${direccionTexto}\n\n¡Gracias por tu compra!`);
     }
 }
 
-/**
- * Resetea el formulario a su estado inicial
- */
-function resetearFormulario() {
-    productCheckboxes.forEach(cb => cb.checked = false);
-    addressRadios.forEach(radio => radio.checked = false);
-    validarProductos();
-    validarDireccion();
-}
-
 // Event Listeners
-productCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', validarProductos);
-});
-
+btnChangeProduct.addEventListener('click', changeProduct);
 addressRadios.forEach(radio => {
     radio.addEventListener('change', validarDireccion);
 });
-
 btnConfirmar.addEventListener('click', confirmarPedido);
 
-// Inicializar validación al cargar la página
+// Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-    validarProductos();
-    validarDireccion();
+    renderNavigation();
+    renderBreadcrumb();
+    actualizarValidacion();
 });

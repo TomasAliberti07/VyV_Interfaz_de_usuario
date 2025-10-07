@@ -9,65 +9,43 @@
 <body>
     <div class="container">
         <header>
-            <h1>🛒 Confirmación de Pedido</h1>
+            <h1>Confirmación de Pedido</h1>
             <p class="subtitle">Ejercicio 3: La Regla de Negocio y el Botón Gris</p>
         </header>
 
         <div class="content">
-            <!-- Sección de Productos -->
+            <!-- Breadcrumb de Selección de Producto -->
             <section class="section">
-                <h2>📦 Selecciona tus Productos</h2>
-                <p class="instruction">Debes seleccionar al menos un producto</p>
+                <h2>Selecciona un Producto</h2>
+                <p class="instruction">Navega por categorías para seleccionar un producto</p>
                 
-                <div class="products">
-                    <label class="product-card">
-                        <input type="checkbox" name="producto" value="laptop" class="product-checkbox">
-                        <div class="card-content">
-                            <span class="product-icon">💻</span>
-                            <h3>Laptop</h3>
-                            <p class="price">$999.99</p>
-                        </div>
-                    </label>
+                <!-- Breadcrumb -->
+                <div class="breadcrumb" id="breadcrumb">
+                    <span class="breadcrumb-item active">Inicio</span>
+                </div>
 
-                    <label class="product-card">
-                        <input type="checkbox" name="producto" value="mouse" class="product-checkbox">
-                        <div class="card-content">
-                            <span class="product-icon">🖱️</span>
-                            <h3>Mouse</h3>
-                            <p class="price">$29.99</p>
-                        </div>
-                    </label>
+                <!-- Área de Navegación -->
+                <div class="navigation-area" id="navigationArea">
+                    <!-- Aquí se cargarán dinámicamente las categorías/subcategorías/productos -->
+                </div>
 
-                    <label class="product-card">
-                        <input type="checkbox" name="producto" value="teclado" class="product-checkbox">
-                        <div class="card-content">
-                            <span class="product-icon">⌨️</span>
-                            <h3>Teclado</h3>
-                            <p class="price">$79.99</p>
-                        </div>
-                    </label>
-
-                    <label class="product-card">
-                        <input type="checkbox" name="producto" value="monitor" class="product-checkbox">
-                        <div class="card-content">
-                            <span class="product-icon">🖥️</span>
-                            <h3>Monitor</h3>
-                            <p class="price">$299.99</p>
-                        </div>
-                    </label>
+                <!-- Producto Seleccionado -->
+                <div class="selected-product" id="selectedProduct" style="display: none;">
+                    <div class="badge success">Producto seleccionado</div>
+                    <p class="product-name" id="productName"></p>
+                    <button class="btn-change" id="btnChangeProduct">Cambiar producto</button>
                 </div>
             </section>
 
             <!-- Sección de Dirección -->
             <section class="section">
-                <h2>📍 Selecciona tu Dirección de Envío</h2>
-                <p class="instruction">Debes seleccionar una dirección de envío</p>
+                <h2>Dirección de Envío</h2>
+                <p class="instruction">Selecciona una dirección de envío</p>
                 
                 <div class="addresses">
                     <label class="address-card">
                         <input type="radio" name="direccion" value="casa" class="address-radio">
-                        <div class="card-content">
-                            <span class="address-icon">🏠</span>
+                        <div class="address-content">
                             <h3>Casa</h3>
                             <p>Av. Principal 123, Ciudad</p>
                         </div>
@@ -75,8 +53,7 @@
 
                     <label class="address-card">
                         <input type="radio" name="direccion" value="oficina" class="address-radio">
-                        <div class="card-content">
-                            <span class="address-icon">🏢</span>
+                        <div class="address-content">
                             <h3>Oficina</h3>
                             <p>Calle Comercial 456, Centro</p>
                         </div>
@@ -84,8 +61,7 @@
 
                     <label class="address-card">
                         <input type="radio" name="direccion" value="otro" class="address-radio">
-                        <div class="card-content">
-                            <span class="address-icon">📮</span>
+                        <div class="address-content">
                             <h3>Otra Dirección</h3>
                             <p>Apartado Postal 789</p>
                         </div>
@@ -96,11 +72,11 @@
             <!-- Estado de Validación -->
             <section class="validation-status">
                 <div class="status-item" id="status-producto">
-                    <span class="status-icon">❌</span>
+                    <span class="status-indicator"></span>
                     <span class="status-text">Producto no seleccionado</span>
                 </div>
                 <div class="status-item" id="status-direccion">
-                    <span class="status-icon">❌</span>
+                    <span class="status-indicator"></span>
                     <span class="status-text">Dirección no seleccionada</span>
                 </div>
             </section>
@@ -108,8 +84,7 @@
             <!-- Botón de Confirmación -->
             <div class="button-container">
                 <button id="btnConfirmar" class="btn-confirmar" disabled>
-                    <span class="btn-icon">🔒</span>
-                    <span class="btn-text">Confirmar Pedido</span>
+                    Confirmar Pedido
                 </button>
                 <p class="helper-text" id="helperText">
                     Completa ambos requisitos para habilitar el botón
