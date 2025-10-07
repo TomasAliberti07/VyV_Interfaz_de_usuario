@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Pedido - Ejercicio 3</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Confirmación de Pedido</h1>
+            <p class="subtitle">Ejercicio 3: La Regla de Negocio y el Botón Gris</p>
+        </header>
+
+        <div class="content">
+            <!-- Sección de Productos -->
+            <section class="section">
+                <h2>📦 Selecciona tus Productos</h2>
+                <p class="instruction">Debes seleccionar al menos un producto</p>
+                
+                <div class="products">
+                    <label class="product-card">
+                        <input type="checkbox" name="producto" value="laptop" class="product-checkbox">
+                        <div class="card-content">
+                            <span class="product-icon">💻</span>
+                            <h3>Laptop</h3>
+                            <p class="price">$999.99</p>
+                        </div>
+                    </label>
+
+                    <label class="product-card">
+                        <input type="checkbox" name="producto" value="mouse" class="product-checkbox">
+                        <div class="card-content">
+                            <span class="product-icon">🖱️</span>
+                            <h3>Mouse</h3>
+                            <p class="price">$29.99</p>
+                        </div>
+                    </label>
+
+                    <label class="product-card">
+                        <input type="checkbox" name="producto" value="teclado" class="product-checkbox">
+                        <div class="card-content">
+                            <span class="product-icon">⌨️</span>
+                            <h3>Teclado</h3>
+                            <p class="price">$79.99</p>
+                        </div>
+                    </label>
+
+                    <label class="product-card">
+                        <input type="checkbox" name="producto" value="monitor" class="product-checkbox">
+                        <div class="card-content">
+                            <span class="product-icon">🖥️</span>
+                            <h3>Monitor</h3>
+                            <p class="price">$299.99</p>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Sección de Dirección -->
+            <section class="section">
+                <h2>📍 Selecciona tu Dirección de Envío</h2>
+                <p class="instruction">Debes seleccionar una dirección de envío</p>
+                
+                <div class="addresses">
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="casa" class="address-radio">
+                        <div class="card-content">
+                            <span class="address-icon">🏠</span>
+                            <h3>Casa</h3>
+                            <p>Av. Principal 123, Ciudad</p>
+                        </div>
+                    </label>
+
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="oficina" class="address-radio">
+                        <div class="card-content">
+                            <span class="address-icon">🏢</span>
+                            <h3>Oficina</h3>
+                            <p>Calle Comercial 456, Centro</p>
+                        </div>
+                    </label>
+
+                    <label class="address-card">
+                        <input type="radio" name="direccion" value="otro" class="address-radio">
+                        <div class="card-content">
+                            <span class="address-icon">📮</span>
+                            <h3>Otra Dirección</h3>
+                            <p>Apartado Postal 789</p>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Estado de Validación -->
+            <section class="validation-status">
+                <div class="status-item" id="status-producto">
+                    <span class="status-icon">❌</span>
+                    <span class="status-text">Producto no seleccionado</span>
+                </div>
+                <div class="status-item" id="status-direccion">
+                    <span class="status-icon">❌</span>
+                    <span class="status-text">Dirección no seleccionada</span>
+                </div>
+            </section>
+
+            <!-- Botón de Confirmación -->
+            <div class="button-container">
+                <button id="btnConfirmar" class="btn-confirmar" disabled>
+                    <span class="btn-icon">🔒</span>
+                    <span class="btn-text">Confirmar Pedido</span>
+                </button>
+                <p class="helper-text" id="helperText">
+                    Completa ambos requisitos para habilitar el botón
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Regla de Negocio:</strong> El usuario no puede confirmar el pedido hasta que haya seleccionado al menos un producto y una dirección de envío.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
