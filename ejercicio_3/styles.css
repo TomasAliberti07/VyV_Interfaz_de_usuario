@@ -8,6 +8,8 @@
   --card: #2c2c2c;
   --accent: #4caf50;
   --danger: #ff5c5c;
+  --input-bg: #2a2a2a;
+  --input-border: #3a3a3a;
 }
 
 /* Page layout */
@@ -64,62 +66,85 @@ header h1 {
   margin-bottom: 12px;
 }
 
-/* Breadcrumb */
-.breadcrumb {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.breadcrumb-item {
-  font-size: 0.9rem;
-  color: var(--muted);
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  background: transparent;
-}
-.breadcrumb-item.active {
-  color: #fff;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.03),
-    rgba(255, 255, 255, 0.01)
-  );
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) inset;
-}
-
-/* Navigation area (cards grid) */
-.navigation-area {
+/* Dropdown container */
+.dropdown-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-.nav-card {
-  background: var(--card);
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-}
-.nav-card h3 {
-  margin: 0 0 6px 0;
-  font-size: 1rem;
-}
-.nav-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-.nav-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.nav-card.product {
-  border-left: 4px solid rgba(255, 255, 255, 0.05);
+/* Form styles */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.form-select,
+.form-input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: #e6e6e6;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.form-select:focus,
+.form-input:focus {
+  border-color: var(--primary-start);
+  box-shadow: 0 0 0 3px rgba(0, 230, 246, 0.1);
+}
+
+.form-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-input.valid {
+  border-color: var(--accent);
+}
+
+.form-input.error {
+  border-color: var(--danger);
+}
+
+textarea.form-input {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Address form */
+.address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+}
+
+.form-group-small {
+  max-width: 150px;
+}
+
+.error-message {
+  font-size: 0.8rem;
+  color: var(--danger);
+  min-height: 16px;
+  display: block;
 }
 
 /* Selected product */
@@ -128,6 +153,11 @@ header h1 {
   flex-direction: column;
   gap: 10px;
   align-items: flex-start;
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(74, 175, 80, 0.08);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
 }
 .badge {
   padding: 6px 10px;
@@ -142,48 +172,7 @@ header h1 {
 .product-name {
   font-weight: 600;
   color: #fff;
-}
-.btn-change {
-  background: #333;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-.btn-change:hover {
-  background: #444;
-  transform: translateY(-2px);
-}
-
-/* Address cards */
-.addresses {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-.address-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  background: var(--card);
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-}
-.address-card input[type="radio"] {
-  margin-right: 8px;
-  margin-top: 4px;
-}
-.address-content h3 {
   margin: 0;
-  font-size: 1rem;
-}
-.address-content p {
-  margin: 4px 0 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 /* Validation status */
@@ -267,7 +256,13 @@ footer {
     margin: 18px;
     padding: 18px;
   }
-  .navigation-area {
+  .dropdown-container {
     grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-group-small {
+    max-width: 100%;
   }
 }
