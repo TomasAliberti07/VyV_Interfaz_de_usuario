@@ -75,8 +75,15 @@ h1 {
     line-height: 1.6;
 }
 
-.form {
+.form-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
     margin-bottom: 30px;
+}
+
+.form {
+    min-width: 0; /* Permite que el formulario se contraiga */
 }
 
 .form-group {
@@ -200,8 +207,10 @@ input[readonly] {
     background: #333333;
     border-radius: 15px;
     padding: 20px;
-    margin-bottom: 25px;
     border: 2px solid #404040;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
 }
 
 .password-requirements h4 {
@@ -445,6 +454,13 @@ input[readonly] {
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+    .form-container {
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+    }
+}
+
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -456,6 +472,11 @@ input[readonly] {
     
     h1 {
         font-size: 2rem;
+    }
+    
+    .form-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
     
     .test-grid {
@@ -472,6 +493,7 @@ input[readonly] {
     
     .password-requirements {
         padding: 15px;
+        position: static;
     }
     
     .requirement {
