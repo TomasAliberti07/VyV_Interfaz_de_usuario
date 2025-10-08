@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Contraseña - Impacto en la Experiencia del Usuario</title>
+    <link rel="stylesheet" href="ejercicio5styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 id="mainTitle">Cambio de Contraseña</h1>
+            <p class="subtitle">Trabajo Práctico Integrador - EC VyV con UI</p>
+            
+            <div class="demo-section" id="demoSection">
+                <h2 id="demoTitle">🔒 Validación de Contraseña con Carácter Especial</h2>
+                <p class="description" id="demoDescription">
+                    El sistema <strong>requiere al menos un carácter especial</strong> (!@#$%^&*) en la contraseña
+                </p>
+            </div>
+
+            <form class="form" id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Contraseña actual</label>
+                    <input type="password" id="currentPassword" name="currentPassword" value="micontraseña123" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">Nueva contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Ingrese su nueva contraseña" required>
+                        <button type="button" class="toggle-password" id="toggleNewPassword">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="help-text">Debe contener al menos un carácter especial (!@#$%^&*)</div>
+                    <div class="validation-message" id="validationMessage"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar nueva contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirme su nueva contraseña" required>
+                        <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="validation-message" id="confirmValidationMessage"></div>
+                </div>
+
+                <div class="password-requirements" id="passwordRequirements">
+                    <h4>Requisitos de la contraseña:</h4>
+                    <div class="requirement" id="lengthReq">
+                        <span class="req-icon">❌</span> Al menos 8 caracteres
+                    </div>
+                    <div class="requirement" id="upperReq">
+                        <span class="req-icon">❌</span> Al menos una letra mayúscula
+                    </div>
+                    <div class="requirement" id="lowerReq">
+                        <span class="req-icon">❌</span> Al menos una letra minúscula
+                    </div>
+                    <div class="requirement" id="numberReq">
+                        <span class="req-icon">❌</span> Al menos un número
+                    </div>
+                    <div class="requirement" id="specialReq">
+                        <span class="req-icon">❌</span> Al menos un carácter especial (!@#$%^&*)
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>Cambiar Contraseña</button>
+            </form>
+
+            <div class="test-cases">
+                <h3>🧪 Casos de Prueba</h3>
+                <div class="test-grid">
+                    <div class="test-case error" data-password="MiContraseña123">
+                        <strong>❌ Sin carácter especial:</strong> MiContraseña123
+                    </div>
+                    <div class="test-case error" data-password="micontraseña123">
+                        <strong>❌ Sin mayúscula ni especial:</strong> micontraseña123
+                    </div>
+                    <div class="test-case valid" data-password="MiContraseña123!">
+                        <strong>✅ Válida:</strong> MiContraseña123!
+                    </div>
+                    <div class="test-case valid" data-password="Segura2024@">
+                        <strong>✅ Válida:</strong> Segura2024@
+                    </div>
+                </div>
+                <p class="error-explanation">
+                    <strong>¡Problema de UX!</strong> Los usuarios frecuentemente olvidan incluir caracteres especiales, lo que genera frustración al ser rechazadas contraseñas que consideran "seguras".
+                </p>
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <div class="error-content">
+                    <span class="error-icon">❌</span>
+                    <div>
+                        <strong>Error de validación</strong>
+                        <p id="errorText"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success-message" id="successMessage" style="display: none;">
+                <div class="success-content">
+                    <span class="success-icon">🎉</span>
+                    <div>
+                        <strong>¡Contraseña cambiada exitosamente!</strong>
+                        <p id="successText"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="final-success-banner" id="finalSuccessBanner" style="display: none;">
+                <div class="banner-content">
+                    <span class="banner-icon">🔐</span>
+                    <div>
+                        <strong>¡Contraseña actualizada!</strong>
+                        <p>Su contraseña ha sido cambiada exitosamente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('passwordForm');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const validationMessage = document.getElementById('validationMessage');
+        const confirmValidationMessage = document.getElementById('confirmValidationMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        // Referencias a los requisitos
+        const lengthReq = document.getElementById('lengthReq');
+        const upperReq = document.getElementById('upperReq');
+        const lowerReq = document.getElementById('lowerReq');
+        const numberReq = document.getElementById('numberReq');
+        const specialReq = document.getElementById('specialReq');
+
+        // Función para validar contraseña
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*]/.test(password)
+            };
+            
+            return requirements;
+        }
+
+        // Función para actualizar los requisitos visuales
+        function updateRequirements(requirements) {
+            updateRequirement(lengthReq, requirements.length);
+            updateRequirement(upperReq, requirements.upper);
+            updateRequirement(lowerReq, requirements.lower);
+            updateRequirement(numberReq, requirements.number);
+            updateRequirement(specialReq, requirements.special);
+        }
+
+        function updateRequirement(element, isValid) {
+            const icon = element.querySelector('.req-icon');
+            if (isValid) {
+                icon.textContent = '✅';
+                element.classList.add('valid');
+                element.classList.remove('invalid');
+            } else {
+                icon.textContent = '❌';
+                element.classList.add('invalid');
+                element.classList.remove('valid');
+            }
+        }
+
+        // Función para actualizar el contenido de la página según el estado
+        function updatePageContent(hasSpecialChar, isValidPassword) {
+            const mainTitle = document.getElementById('mainTitle');
+            const demoTitle = document.getElementById('demoTitle');
+            const demoDescription = document.getElementById('demoDescription');
+            const demoSection = document.getElementById('demoSection');
+            
+            if (isValidPassword) {
+                // Contraseña completamente válida
+                mainTitle.innerHTML = 'Cambio de Contraseña - <span style="color: #8b47ee;">Válida</span>';
+                demoTitle.innerHTML = '✅ Contraseña Válida';
+                demoDescription.innerHTML = 'La contraseña cumple con <strong>todos los requisitos</strong> incluyendo el carácter especial';
+                demoSection.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1))';
+                demoSection.style.borderColor = 'rgb(34, 197, 94)';
+            } else if (!hasSpecialChar) {
+                // Falta carácter especial - Error principal
+                mainTitle.innerHTML = 'Cambio de Contraseña - <span style="color: #8b47ee;">Error de Validación</span>';
+                demoTitle.innerHTML = '❌ Falta Carácter Especial';
+                demoDescription.innerHTML = 'La contraseña <strong>NO contiene caracteres especiales</strong> requeridos (!@#$%^&*)';
+                demoSection.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))';
+                demoSection.style.borderColor = 'rgb(239, 68, 68)';
+            } else {
+                // Otros errores de validación
+                mainTitle.innerHTML = 'Cambio de Contraseña - <span style="color: #8b47ee;">Validación Parcial</span>';
+                demoTitle.innerHTML = '⚠️ Requisitos Faltantes';
+                demoDescription.innerHTML = 'La contraseña tiene carácter especial pero <strong>faltan otros requisitos</strong>';
+                demoSection.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.1))';
+                demoSection.style.borderColor = 'rgb(234, 179, 8)';
+            }
+        }
+
+        // Validación en tiempo real de la nueva contraseña
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            const requirements = validatePassword(password);
+            
+            updateRequirements(requirements);
+            
+            const allValid = Object.values(requirements).every(req => req);
+            const hasSpecialChar = requirements.special;
+            
+            updatePageContent(hasSpecialChar, allValid);
+            
+            if (password === '') {
+                validationMessage.textContent = '';
+                validationMessage.className = 'validation-message';
+                this.style.borderColor = '#404040';
+                this.style.boxShadow = 'none';
+            } else if (!hasSpecialChar) {
+                validationMessage.textContent = '❌ Falta carácter especial (!@#$%^&*)';
+                validationMessage.className = 'validation-message error';
+                this.style.borderColor = 'rgb(239, 68, 68)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+            } else if (!allValid) {
+                validationMessage.textContent = '⚠️ Faltan algunos requisitos';
+                validationMessage.className = 'validation-message warning';
+                this.style.borderColor = '#eab308';
+                this.style.boxShadow = '0 0 0 3px rgba(234, 179, 8, 0.2)';
+            } else {
+                validationMessage.textContent = '✅ Contraseña válida';
+                validationMessage.className = 'validation-message success';
+                this.style.borderColor = '#00e6e6';
+                this.style.boxShadow = '0 0 0 3px rgba(0, 230, 230, 0.2)';
+            }
+            
+            checkFormValidity();
+        });
+
+        // Validación de confirmación de contraseña
+        confirmPasswordInput.addEventListener('input', function() {
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword === '') {
+                confirmValidationMessage.textContent = '';
+                confirmValidationMessage.className = 'validation-message';
+                this.style.borderColor = '#404040';
+                this.style.boxShadow = 'none';
+            } else if (newPassword !== confirmPassword) {
+                confirmValidationMessage.textContent = '❌ Las contraseñas no coinciden';
+                confirmValidationMessage.className = 'validation-message error';
+                this.style.borderColor = 'rgb(239, 68, 68)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+            } else {
+                confirmValidationMessage.textContent = '✅ Las contraseñas coinciden';
+                confirmValidationMessage.className = 'validation-message success';
+                this.style.borderColor = '#00e6e6';
+                this.style.boxShadow = '0 0 0 3px rgba(0, 230, 230, 0.2)';
+            }
+            
+            checkFormValidity();
+        });
+
+        // Función para verificar si el formulario es válido
+        function checkFormValidity() {
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const requirements = validatePassword(newPassword);
+            const allValid = Object.values(requirements).every(req => req);
+            const passwordsMatch = newPassword === confirmPassword && confirmPassword !== '';
+            
+            if (allValid && passwordsMatch) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        // Manejo del envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = newPasswordInput.value;
+            const requirements = validatePassword(newPassword);
+            const allValid = Object.values(requirements).every(req => req);
+            
+            if (!allValid) {
+                const missingReqs = [];
+                if (!requirements.length) missingReqs.push('al menos 8 caracteres');
+                if (!requirements.upper) missingReqs.push('una letra mayúscula');
+                if (!requirements.lower) missingReqs.push('una letra minúscula');
+                if (!requirements.number) missingReqs.push('un número');
+                if (!requirements.special) missingReqs.push('un carácter especial');
+                
+                document.getElementById('errorText').textContent = 
+                    `La contraseña debe contener: ${missingReqs.join(', ')}.`;
+                errorMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+                
+                return;
+            }
+            
+            // Simular éxito
+            document.getElementById('successText').textContent = 
+                'Su contraseña cumple con todos los requisitos de seguridad.';
+            successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                
+                const finalBanner = document.getElementById('finalSuccessBanner');
+                finalBanner.style.display = 'block';
+                
+                setTimeout(() => {
+                    finalBanner.style.display = 'none';
+                    form.reset();
+                    validationMessage.textContent = '';
+                    confirmValidationMessage.textContent = '';
+                    validationMessage.className = 'validation-message';
+                    confirmValidationMessage.className = 'validation-message';
+                    newPasswordInput.style.borderColor = '#404040';
+                    newPasswordInput.style.boxShadow = 'none';
+                    confirmPasswordInput.style.borderColor = '#404040';
+                    confirmPasswordInput.style.boxShadow = 'none';
+                    
+                    // Resetear requisitos
+                    document.querySelectorAll('.requirement').forEach(req => {
+                        req.classList.remove('valid', 'invalid');
+                        req.querySelector('.req-icon').textContent = '❌';
+                    });
+                    
+                    updatePageContent(false, false);
+                    checkFormValidity();
+                }, 5000);
+            }, 2000);
+        });
+
+        // Funcionalidad para mostrar/ocultar contraseñas
+        function togglePasswordVisibility(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            const eyeIcon = button.querySelector('.eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.textContent = '🙈';
+                button.setAttribute('aria-label', 'Ocultar contraseña');
+                button.title = 'Ocultar contraseña';
+            } else {
+                input.type = 'password';
+                eyeIcon.textContent = '👁️';
+                button.setAttribute('aria-label', 'Mostrar contraseña');
+                button.title = 'Mostrar contraseña';
+            }
+        }
+
+        // Eventos para los botones de mostrar/ocultar contraseña
+        document.getElementById('toggleNewPassword').addEventListener('click', function() {
+            togglePasswordVisibility('newPassword', 'toggleNewPassword');
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword');
+        });
+
+        // Agregar eventos a los casos de prueba
+        document.querySelectorAll('.test-case').forEach(testCase => {
+            testCase.addEventListener('click', function() {
+                const password = this.getAttribute('data-password');
+                newPasswordInput.value = password;
+                confirmPasswordInput.value = password;
+                
+                newPasswordInput.dispatchEvent(new Event('input'));
+                confirmPasswordInput.dispatchEvent(new Event('input'));
+            });
+        });
+
+        // Inicializar con un caso de error para mostrar el problema
+        setTimeout(() => {
+            newPasswordInput.value = 'MiContraseña123';
+            newPasswordInput.dispatchEvent(new Event('input'));
+        }, 500);
+    </script>
+</body>
+</html>
